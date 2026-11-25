@@ -1,0 +1,13 @@
+.git
+.venv
+venv
+.pytest_cache
+.ruff_cache
+**/__pycache__/
+**/*.pyc
+**/*.db
+.env
+.env.*
+tests/
+training/
+requirements-dev.txt
