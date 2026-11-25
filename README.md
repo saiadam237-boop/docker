@@ -86,6 +86,25 @@ flowchart LR
 
 ## 4. Lancer l'application sur votre PC
 
+### Avec Docker Compose
+
+Depuis la racine du dépôt, lancez l'API et PostgreSQL avec Docker Desktop démarré.
+
+```powershell
+docker compose up -d --build --wait
+docker compose ps
+```
+
+Ouvrez http://localhost:8000 pour envoyer un avis. La route `/health` vérifie la connexion de l'API à la base. La route `/history` affiche les prédictions stockées dans PostgreSQL.
+
+Si le port 8000 est déjà utilisé, définissez `$env:API_PORT = "8001"` dans PowerShell avant de lancer Compose, puis ouvrez http://localhost:8001. Le modèle est réglable via `MODEL_VERSION` et vaut `v1` par défaut.
+
+`docker compose down` arrête la stack et conserve les prédictions dans le volume `postgres_data`. Réservez `docker compose down -v` à une réinitialisation volontaire, car cette commande supprime les données.
+
+Pour ce TP local, PostgreSQL accepte les connexions sans mot de passe sur le réseau Docker interne auquel seuls l'API et PostgreSQL sont rattachés. Le port de la base reste interne à Docker. En déploiement, configurez une authentification et fournissez les identifiants via un secret.
+
+### Avec Python
+
 C'est le premier réflexe avant de conteneuriser : **comprendre comment l'application démarre**. Il vous faut **Python 3.12**.
 
 Toutes les commandes se lancent **à la racine du dépôt** (le dossier qui contient ce README).

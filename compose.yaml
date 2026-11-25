@@ -1,0 +1,49 @@
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: postgresql://sentiment@db:5432/sentiment
+      MODEL_VERSION: "${MODEL_VERSION:-v1}"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health', timeout=3).close()"
+      interval: 5s
+      timeout: 4s
+      retries: 5
+      start_period: 15s
+    networks:
+      - default
+      - database
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: sentiment
+      POSTGRES_DB: sentiment
+      # Authentification sans mot de passe, réservée au réseau interne de cette stack locale.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "sentiment", "-d", "sentiment"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - database
+
+networks:
+  database:
+    internal: true
+
+volumes:
+  postgres_data:
